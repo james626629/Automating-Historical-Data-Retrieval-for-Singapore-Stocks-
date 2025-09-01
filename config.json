@@ -1,0 +1,29 @@
+{
+    "tickers": [
+        "D05.SI",
+        "O39.SI",
+        "U11.SI",
+        "C38U.SI",
+        "Z74.SI",
+        "Y92.SI",
+        "C52.SI",
+        "BN4.SI",
+        "9CI.SI",
+        "U96.SI"
+    ],
+    "ticker_names": {
+        "D05.SI": "DBS Group Holdings",
+        "O39.SI": "Oversea-Chinese Banking Corporation (OCBC)",
+        "U11.SI": "United Overseas Bank (UOB)",
+        "C38U.SI": "CapitaLand Integrated Commercial Trust",
+        "Z74.SI": "Singapore Telecommunications (Singtel)",
+        "Y92.SI": "Thai Beverage",
+        "C52.SI": "ComfortDelGro Corporation",
+        "BN4.SI": "Keppel Corporation",
+        "9CI.SI": "CapitaLand Investment",
+        "U96.SI": "Sembcorp Industries"
+    },
+    "output_file": "singapore_stocks_data.xlsx",
+    "years_of_data": 5,
+    "data_source": "yfinance (Yahoo Finance API)"
+}
