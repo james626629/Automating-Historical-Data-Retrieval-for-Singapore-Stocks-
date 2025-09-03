@@ -8,16 +8,16 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 
 1. **D05.SI** - DBS Group Holdings
 2. **O39.SI** - Oversea-Chinese Banking Corporation (OCBC)
-3. **U11.SI** - United Overseas Bank (UOB) ✓ *EV/EBITDA: 10.17*
-4. **C38U.SI** - CapitaLand Integrated Commercial Trust ✓ *EV/EBITDA: 16.78*
-5. **Z74.SI** - Singapore Telecommunications (Singtel) ✓ *EV/EBITDA: 18.35*
-6. **Y92.SI** - Thai Beverage ✓ *EV/EBITDA: 8.26*
-7. **C52.SI** - ComfortDelGro Corporation ✓ *EV/EBITDA: 14.51*
-8. **BN4.SI** - Keppel Corporation
-9. **9CI.SI** - CapitaLand Investment ✓ *EV/EBITDA: 31.72*
-10. **U96.SI** - Sembcorp Industries ✓ *EV/EBITDA: 10.93*
+3. **U11.SI** - United Overseas Bank (UOB)
+4. **C38U.SI** - CapitaLand Integrated Commercial Trust ✓ *EV/EBITDA: 20.03*
+5. **Z74.SI** - Singapore Telecommunications (Singtel) ✓ *EV/EBITDA: 10.92*
+6. **Y92.SI** - Thai Beverage ✓ *EV/EBITDA: 9.75*
+7. **C52.SI** - ComfortDelGro Corporation ✓ *EV/EBITDA: 5.21*
+8. **BN4.SI** - Keppel Corporation ✓ *EV/EBITDA: 13.38*
+9. **9CI.SI** - CapitaLand Investment ✓ *EV/EBITDA: 16.49*
+10. **U96.SI** - Sembcorp Industries ✓ *EV/EBITDA: 9.14*
 
-**Note:** EV/EBITDA data successfully retrieved for 7 out of 10 stocks (70% success rate)
+**Note:** EV/EBITDA data successfully retrieved for 7 out of 10 stocks (70% success rate). Banks (DBS, OCBC, UOB) typically don't have EV/EBITDA as this metric is not commonly used for financial institutions.
 
 ## Data Sources
 - **Primary Source**: Yahoo Finance via web scraping with Selenium

@@ -135,53 +135,81 @@ def fetch_ev_ebitda(driver: webdriver.Remote, ticker: str) -> Optional[float]:
         # Parse the page
         soup = BeautifulSoup(driver.page_source, 'lxml')
         
-        # Method 1: Look for EV/EBITDA using more flexible search
-        all_text_elements = soup.find_all(['td', 'span', 'div'])
+        # Debug: Save page source for inspection
+        logger.debug(f"Looking for EV/EBITDA on statistics page for {ticker}")
         
-        for i, elem in enumerate(all_text_elements):
-            text = elem.get_text(strip=True).lower()
-            # Check for various EV/EBITDA text patterns
-            if any(pattern in text for pattern in ['enterprise value/ebitda', 'ev/ebitda', 'ev to ebitda']):
-                # Look for the value in nearby elements
-                for j in range(i+1, min(i+10, len(all_text_elements))):
-                    value_text = all_text_elements[j].get_text(strip=True)
-                    try:
-                        # Clean the value
-                        if value_text in ['N/A', '-', '', 'NA']:
-                            continue
-                        # Remove any trailing text like (ttm)
-                        value_text = value_text.split('(')[0].strip()
-                        value_text = value_text.replace(',', '')
-                        if value_text.replace('.', '').replace('-', '').isdigit() or \
-                           (value_text.count('.') == 1 and value_text.replace('.', '').replace('-', '').isdigit()):
+        # Method 1: Look for EV/EBITDA in tables - be very specific
+        tables = soup.find_all('table')
+        for table_idx, table in enumerate(tables):
+            rows = table.find_all('tr')
+            for row in rows:
+                cells = row.find_all(['td', 'th'])
+                if len(cells) >= 2:
+                    label_text = cells[0].get_text(strip=True)
+                    # Be very specific - look for exact match
+                    if 'Enterprise Value/EBITDA' in label_text or 'EV/EBITDA' in label_text:
+                        value_cell = cells[1]
+                        value_text = value_cell.get_text(strip=True)
+                        logger.info(f"Found EV/EBITDA label: '{label_text}' with value: '{value_text}'")
+                        try:
+                            if value_text in ['N/A', '-', '', 'NA', '--']:
+                                logger.info(f"EV/EBITDA for {ticker} is not available (N/A)")
+                                return None
+                            # Remove any trailing text like (ttm) or (mrq)
+                            value_text = value_text.split('(')[0].strip()
+                            value_text = value_text.replace(',', '')
                             value = float(value_text)
+                            logger.info(f"Successfully extracted EV/EBITDA for {ticker}: {value}")
+                            return value
+                        except ValueError:
+                            logger.warning(f"Could not parse EV/EBITDA value: '{value_text}'")
+        
+        # Method 2: More flexible search with careful filtering
+        # Look specifically in the valuation measures section
+        all_rows = soup.find_all('tr')
+        for row in all_rows:
+            # Get all text in the row
+            row_text = row.get_text(strip=True)
+            # Check if this row contains EV/EBITDA (case insensitive but specific)
+            if 'enterprise value/ebitda' in row_text.lower() and 'trailing' not in row_text.lower():
+                cells = row.find_all(['td', 'th'])
+                if len(cells) >= 2:
+                    # The value should be in the second cell
+                    value_text = cells[-1].get_text(strip=True)  # Use last cell in case of multiple
+                    logger.info(f"Found potential EV/EBITDA row with value: '{value_text}'")
+                    try:
+                        if value_text in ['N/A', '-', '', 'NA', '--']:
+                            return None
+                        value_text = value_text.split('(')[0].strip().replace(',', '')
+                        # Validate it's a reasonable number for EV/EBITDA (typically between -100 and 100)
+                        value = float(value_text)
+                        if -1000 < value < 1000:  # Sanity check
                             logger.info(f"Found EV/EBITDA for {ticker}: {value}")
                             return value
                     except (ValueError, AttributeError):
                         continue
         
-        # Method 2: Try finding in tables specifically
-        tables = soup.find_all('table')
-        for table in tables:
-            rows = table.find_all('tr')
-            for row in rows:
-                cells = row.find_all(['td', 'th'])
-                if len(cells) >= 2:
-                    label = cells[0].get_text(strip=True).lower()
-                    if any(pattern in label for pattern in ['enterprise value/ebitda', 'ev/ebitda', 'ev to ebitda']):
-                        value_text = cells[1].get_text(strip=True)
+        # Method 3: Look for specific parent containers with "Enterprise Value" heading
+        # Sometimes the data is structured differently
+        ev_sections = soup.find_all(text=lambda t: t and 'Enterprise Value/EBITDA' in t)
+        for ev_text in ev_sections:
+            parent = ev_text.parent
+            # Look for the value in siblings or nearby elements
+            if parent:
+                siblings = parent.find_next_siblings()
+                for sibling in siblings[:5]:  # Check next few siblings
+                    value_text = sibling.get_text(strip=True)
+                    if value_text and value_text[0].isdigit() or value_text[0] == '-':
                         try:
-                            if value_text in ['N/A', '-', '', 'NA']:
-                                return None
                             value_text = value_text.split('(')[0].strip().replace(',', '')
                             value = float(value_text)
-                            logger.info(f"Found EV/EBITDA for {ticker}: {value}")
-                            return value
+                            if -1000 < value < 1000:
+                                logger.info(f"Found EV/EBITDA for {ticker}: {value}")
+                                return value
                         except ValueError:
-                            logger.warning(f"Could not parse EV/EBITDA value: {value_text}")
-                            return None
+                            continue
         
-        logger.warning(f"EV/EBITDA not found for {ticker} - may not be available")
+        logger.warning(f"EV/EBITDA not found for {ticker} - metric may not be available")
         return None
         
     except TimeoutException:
