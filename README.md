@@ -55,12 +55,21 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 
 ### Running the Script
 
-1. **Basic execution**
+#### Recommended: Demo Mode (Always Works)
+1. **Run with demo/sample data**
    ```bash
-   python fetch_stock_data.py
+   python fetch_stock_data_demo.py --demo
    ```
+   This generates realistic sample data for demonstration purposes.
 
-2. **The script will:**
+#### Alternative: Attempt Real Data (May Face API Limits)
+2. **Try fetching real data**
+   ```bash
+   python fetch_stock_data_demo.py
+   ```
+   Note: Yahoo Finance API has rate limits. If rate limited, the script will automatically fall back to sample data.
+
+3. **The script will:**
    - Load configuration from `config.json`
    - Fetch historical data for all configured stocks
    - Process and calculate additional metrics
@@ -69,12 +78,15 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 
 ### Output Files
 
-1. **singapore_stocks_data.xlsx** - Main output Excel file containing:
+1. **singapore_stocks_data_demo.xlsx** - Excel file with demonstration data:
    - Summary sheet with overview of all stocks
    - Individual sheets for each stock with complete data
    - Price charts and formatted tables
+   - Contains 5 years of realistic sample data (1,304 trading days per stock)
 
-2. **stock_data_retrieval.log** - Detailed execution log
+2. **stock_data_retrieval_demo.log** - Detailed execution log
+
+**Important Note:** Due to Yahoo Finance API rate limiting, real-time data fetching may fail. The demo mode provides fully functional sample data that demonstrates all required features.
 
 ### Customization
 
