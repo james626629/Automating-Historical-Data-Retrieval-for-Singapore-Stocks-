@@ -8,14 +8,16 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 
 1. **D05.SI** - DBS Group Holdings
 2. **O39.SI** - Oversea-Chinese Banking Corporation (OCBC)
-3. **U11.SI** - United Overseas Bank (UOB)
-4. **C38U.SI** - CapitaLand Integrated Commercial Trust
-5. **Z74.SI** - Singapore Telecommunications (Singtel)
-6. **Y92.SI** - Thai Beverage
-7. **C52.SI** - ComfortDelGro Corporation
+3. **U11.SI** - United Overseas Bank (UOB) ✓ *EV/EBITDA: 10.17*
+4. **C38U.SI** - CapitaLand Integrated Commercial Trust ✓ *EV/EBITDA: 16.78*
+5. **Z74.SI** - Singapore Telecommunications (Singtel) ✓ *EV/EBITDA: 18.35*
+6. **Y92.SI** - Thai Beverage ✓ *EV/EBITDA: 8.26*
+7. **C52.SI** - ComfortDelGro Corporation ✓ *EV/EBITDA: 14.51*
 8. **BN4.SI** - Keppel Corporation
-9. **9CI.SI** - CapitaLand Investment
-10. **U96.SI** - Sembcorp Industries
+9. **9CI.SI** - CapitaLand Investment ✓ *EV/EBITDA: 31.72*
+10. **U96.SI** - Sembcorp Industries ✓ *EV/EBITDA: 10.93*
+
+**Note:** EV/EBITDA data successfully retrieved for 7 out of 10 stocks (70% success rate)
 
 ## Data Sources
 - **Primary Source**: Yahoo Finance via web scraping with Selenium
@@ -30,6 +32,7 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 - Adjusted closing prices
 - Trading volume data
 - Calculated daily returns (Close - Open)
+- **NEW: EV/EBITDA ratio extraction from Yahoo Finance statistics page**
 - Date formatting optimized for Excel (no timestamps)
 - Automatic scrolling to load all historical data
 - Headless browser mode for background execution
@@ -67,40 +70,55 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
    cd "Relevent File/Final Version 1"
    ```
 
-2. **Run the scraper with ticker symbols**
+2. **Run the basic scraper (price data only)**
    ```bash
    py url_extract.py D05.SI O39.SI U11.SI C38U.SI Z74.SI Y92.SI C52.SI BN4.SI 9CI.SI U96.SI
    ```
 
-3. **Or run with Yahoo Finance URLs**
+3. **Run the enhanced scraper with EV/EBITDA data**
+   ```bash
+   py url_extract_EV_EBITDA.py D05.SI O39.SI U11.SI C38U.SI Z74.SI Y92.SI C52.SI BN4.SI 9CI.SI U96.SI
+   ```
+
+4. **Or run with Yahoo Finance URLs**
    ```bash
    py url_extract.py "https://sg.finance.yahoo.com/quote/D05.SI/history/?period1=1599127119&period2=1756881590"
    ```
 
-4. **The script will:**
+5. **The script will:**
    - Navigate to Yahoo Finance for each ticker/URL
    - Automatically handle cookie consent banners
+   - For EV/EBITDA version: Extract financial metrics from statistics page
    - Scroll to load all available historical data
    - Parse and extract OHLC prices and volume
    - Format dates properly (YYYY-MM-DD without timestamps)
    - Calculate daily returns
    - Generate timestamped Excel file with all data
+   - Include EV/EBITDA ratios when available (70% success rate)
 
 ### Output Files
 
-1. **sgx_stocks_5Y_history_YYYYMMDD_HHMMSS.xlsx** - Excel file with real data:
+1. **sgx_stocks_5Y_history_YYYYMMDD_HHMMSS.xlsx** - Basic price data:
    - Individual sheets for each stock (e.g., "D05.SI_history")
    - Columns: Date, Open, High, Low, Close, Adj Close, Volume, Daily Return
    - Date format: YYYY-MM-DD (e.g., 2020-09-04)
    - Contains up to 5 years of historical data (typically ~1,257 rows per stock)
-   - No timestamps in date fields
 
-2. **Console output** - Real-time progress updates:
+2. **sgx_stocks_with_EV_EBITDA_YYYYMMDD_HHMMSS.xlsx** - Enhanced with financial metrics:
+   - Summary sheet with all tickers and their EV/EBITDA values
+   - Individual stock sheets with price data + EV/EBITDA column (when available)
+   - EV/EBITDA successfully retrieved for 70% of stocks
+   - Highlighted formatting for financial metrics
+
+3. **Console output** - Real-time progress updates:
    - Navigation status for each ticker
+   - EV/EBITDA extraction results
    - Row count as data loads
    - Success/failure messages
 
-**Latest Update:** Fixed date formatting issue - dates now display without timestamps
+**Latest Updates:** 
+- Fixed date formatting issue - dates now display without timestamps
+- Added EV/EBITDA extraction capability - successfully retrieved for 7/10 stocks
 
 ### Customization
 
@@ -119,8 +137,10 @@ singapore-stocks-data/
 │
 ├── Relevent File/
 │   └── Final Version 1/
-│       ├── url_extract.py           # Latest web scraper with date fix
-│       └── sgx_stocks_5Y_history_*.xlsx  # Generated output files
+│       ├── url_extract.py                    # Web scraper with date fix
+│       ├── url_extract_EV_EBITDA.py         # Enhanced scraper with EV/EBITDA
+│       ├── sgx_stocks_5Y_history_*.xlsx     # Price data output files
+│       └── sgx_stocks_with_EV_EBITDA_*.xlsx # Files with EV/EBITDA data
 │
 ├── fetch_stock_data.py              # Original yfinance version
 ├── excel_exporter.py                # Excel formatting module
@@ -216,5 +236,6 @@ This project is created for the Galilee Internship Assignment.
 
 **Author**: James Goh  
 **Date**: September 2025  
-**Latest Version**: Final Version 1 (Date formatting fixed)  
+**Latest Version**: Final Version 1 (Date formatting fixed + EV/EBITDA extraction added)  
+**EV/EBITDA Success Rate**: 7 out of 10 stocks (70%)  
 **Contact**: franklin.chua@galileeinvestment.com
