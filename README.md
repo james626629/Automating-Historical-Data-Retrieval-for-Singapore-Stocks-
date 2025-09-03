@@ -18,20 +18,22 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
 10. **U96.SI** - Sembcorp Industries
 
 ## Data Sources
-- **Primary Source**: Yahoo Finance via `yfinance` Python library
-- **API Type**: Free public API (no authentication required)
+- **Primary Source**: Yahoo Finance via web scraping with Selenium
+- **Method**: Automated browser navigation and data extraction
 - **Data Coverage**: Daily historical data for the past 5 years
+- **Latest Version**: Final Version 1 (September 2025)
 
 ## Features
-- Automated data retrieval for multiple stocks
-- Daily adjusted closing prices
+- Automated web scraping for multiple stocks using Selenium WebDriver
+- Support for both ticker symbols and direct Yahoo Finance URLs
+- Daily OHLC (Open, High, Low, Close) prices
+- Adjusted closing prices
 - Trading volume data
-- Calculated daily returns
-- Moving averages (20, 50, and 200-day)
-- Volatility metrics
-- Quarterly EV/EBITDA (when available)
-- Professional Excel formatting with summary sheet
-- Price charts for visual analysis
+- Calculated daily returns (Close - Open)
+- Date formatting optimized for Excel (no timestamps)
+- Automatic scrolling to load all historical data
+- Headless browser mode for background execution
+- Multi-stock batch processing with separate Excel sheets
 
 ## Installation
 
@@ -50,43 +52,55 @@ The following 10 Singapore stocks have been selected from the SGX Mainboard:
    ```bash
    pip install -r requirements.txt
    ```
+   
+   **Additional requirements for Final Version 1:**
+   ```bash
+   pip install selenium beautifulsoup4 lxml webdriver-manager pandas openpyxl
+   ```
 
 ## Usage
 
-### Running the Script
+### Running the Latest Version (Final Version 1)
 
-#### Recommended: Demo Mode (Always Works)
-1. **Run with demo/sample data**
+1. **Navigate to the Final Version 1 directory**
    ```bash
-   python fetch_stock_data_demo.py --demo
+   cd "Relevent File/Final Version 1"
    ```
-   This generates realistic sample data for demonstration purposes.
 
-#### Alternative: Attempt Real Data (May Face API Limits)
-2. **Try fetching real data**
+2. **Run the scraper with ticker symbols**
    ```bash
-   python fetch_stock_data_demo.py
+   py url_extract.py D05.SI O39.SI U11.SI C38U.SI Z74.SI Y92.SI C52.SI BN4.SI 9CI.SI U96.SI
    ```
-   Note: Yahoo Finance API has rate limits. If rate limited, the script will automatically fall back to sample data.
 
-3. **The script will:**
-   - Load configuration from `config.json`
-   - Fetch historical data for all configured stocks
-   - Process and calculate additional metrics
-   - Generate an Excel file with formatted output
-   - Create a log file for debugging
+3. **Or run with Yahoo Finance URLs**
+   ```bash
+   py url_extract.py "https://sg.finance.yahoo.com/quote/D05.SI/history/?period1=1599127119&period2=1756881590"
+   ```
+
+4. **The script will:**
+   - Navigate to Yahoo Finance for each ticker/URL
+   - Automatically handle cookie consent banners
+   - Scroll to load all available historical data
+   - Parse and extract OHLC prices and volume
+   - Format dates properly (YYYY-MM-DD without timestamps)
+   - Calculate daily returns
+   - Generate timestamped Excel file with all data
 
 ### Output Files
 
-1. **singapore_stocks_data_demo.xlsx** - Excel file with demonstration data:
-   - Summary sheet with overview of all stocks
-   - Individual sheets for each stock with complete data
-   - Price charts and formatted tables
-   - Contains 5 years of realistic sample data (1,304 trading days per stock)
+1. **sgx_stocks_5Y_history_YYYYMMDD_HHMMSS.xlsx** - Excel file with real data:
+   - Individual sheets for each stock (e.g., "D05.SI_history")
+   - Columns: Date, Open, High, Low, Close, Adj Close, Volume, Daily Return
+   - Date format: YYYY-MM-DD (e.g., 2020-09-04)
+   - Contains up to 5 years of historical data (typically ~1,257 rows per stock)
+   - No timestamps in date fields
 
-2. **stock_data_retrieval_demo.log** - Detailed execution log
+2. **Console output** - Real-time progress updates:
+   - Navigation status for each ticker
+   - Row count as data loads
+   - Success/failure messages
 
-**Important Note:** Due to Yahoo Finance API rate limiting, real-time data fetching may fail. The demo mode provides fully functional sample data that demonstrates all required features.
+**Latest Update:** Fixed date formatting issue - dates now display without timestamps
 
 ### Customization
 
@@ -103,13 +117,17 @@ To modify the stock selection or settings, edit `config.json`:
 ```
 singapore-stocks-data/
 │
-├── fetch_stock_data.py      # Main script for data retrieval
-├── excel_exporter.py         # Excel formatting and export module
-├── config.json              # Configuration file
-├── requirements.txt         # Python dependencies
-├── README.md               # This file
-├── singapore_stocks_data.xlsx  # Output file (generated)
-└── stock_data_retrieval.log   # Log file (generated)
+├── Relevent File/
+│   └── Final Version 1/
+│       ├── url_extract.py           # Latest web scraper with date fix
+│       └── sgx_stocks_5Y_history_*.xlsx  # Generated output files
+│
+├── fetch_stock_data.py              # Original yfinance version
+├── excel_exporter.py                # Excel formatting module
+├── config.json                      # Configuration file
+├── requirements.txt                 # Python dependencies
+├── README.md                        # This file
+└── Various debug and test scripts
 ```
 
 ## Assumptions
@@ -137,17 +155,20 @@ singapore-stocks-data/
 ## Challenges and Solutions
 
 ### Challenges Faced
-1. **API Limitations**: Free tier may have rate limits
-   - *Solution*: Implemented error handling and retry logic
+1. **Date Formatting Issue**: Excel displaying dates with timestamps (12:00:00 AM)
+   - *Solution*: Convert datetime to date-only format using `.dt.date`
 
-2. **Missing Historical Data**: Some stocks may have limited history
-   - *Solution*: Graceful handling of incomplete data
+2. **Dynamic Content Loading**: Yahoo Finance uses lazy loading for historical data
+   - *Solution*: Implemented automatic scrolling with stability detection
 
-3. **EV/EBITDA Data**: Quarterly financial metrics not readily available
-   - *Solution*: Fetched latest available value when possible
+3. **Cookie Consent Banners**: Blocking access to data
+   - *Solution*: Automated cookie acceptance handling
 
-4. **Excel Formatting**: Complex formatting requirements
-   - *Solution*: Used openpyxl for advanced Excel features
+4. **Browser Detection**: Sites detecting automated browsers
+   - *Solution*: Stealth mode configuration with webdriver tweaks
+
+5. **Rate Limiting**: Need to be respectful of server resources
+   - *Solution*: Added delays between requests
 
 ### Suggestions for Improvement
 
@@ -193,6 +214,7 @@ This project is created for the Galilee Internship Assignment.
 
 ---
 
-**Author**: Internship Candidate  
+**Author**: James Goh  
 **Date**: September 2025  
+**Latest Version**: Final Version 1 (Date formatting fixed)  
 **Contact**: franklin.chua@galileeinvestment.com
